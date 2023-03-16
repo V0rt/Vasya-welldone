@@ -265,12 +265,29 @@ namespace cuda {
         }
 
         __host__
-        void operator()(vcf &dst, const vcf &src) {
+        void operator()(cf *vec) {
+            cufftExecC2C(plan,
+                         (cufftComplex *) tr::raw_pointer_cast(vec),
+                         (cufftComplex *) tr::raw_pointer_cast(vec),
+                         CUFFT_FORWARD);
+        }
+
+        __host__
+        void operator()(vcf dst, const vcf &src) {
             cufftExecC2C(plan,
                          (cufftComplex *) tr::raw_pointer_cast(src.data()),
                          (cufftComplex *) tr::raw_pointer_cast(dst.data()),
                          CUFFT_FORWARD);
         }
+
+        __host__
+        void operator()(cf *dst, const cf *src) {
+            cufftExecC2C(plan,
+                         (cufftComplex *) tr::raw_pointer_cast(src),
+                         (cufftComplex *) tr::raw_pointer_cast(dst),
+                         CUFFT_FORWARD);
+        }
+
     };
 
     class ifft : tr::unary_function<vcf, vcf> {
@@ -292,10 +309,26 @@ namespace cuda {
         }
 
         __host__
+        void operator()(cf *vec) {
+            cufftExecC2C(plan,
+                         (cufftComplex *) tr::raw_pointer_cast(vec),
+                         (cufftComplex *) tr::raw_pointer_cast(vec),
+                         CUFFT_INVERSE);
+        }
+
+        __host__
         void operator()(vcf &dst, const vcf &src) {
             cufftExecC2C(plan,
                          (cufftComplex *) tr::raw_pointer_cast(src.data()),
                          (cufftComplex *) tr::raw_pointer_cast(dst.data()),
+                         CUFFT_INVERSE);
+        }
+
+        __host__
+        void operator()(cf *dst, const cf *src) {
+            cufftExecC2C(plan,
+                         (cufftComplex *) tr::raw_pointer_cast(src),
+                         (cufftComplex *) tr::raw_pointer_cast(dst),
                          CUFFT_INVERSE);
         }
     };

@@ -16,6 +16,7 @@ project(locacoca VERSION 1.0.0.0 LANGUAGES CXX CUDA)
 #find_package(UHD 3.10.0 REQUIRED)
 find_package(Boost COMPONENTS system filesystem thread program_options regex REQUIRED)
 find_package(CUDA REQUIRED)
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 #message("UHD paths: \n"
 #        "\t" ${UHD_LIBRARIES} "\n"
 #        "\t" ${UHD_INCLUDE_DIRS} "\n"
@@ -28,7 +29,8 @@ find_package(CUDA REQUIRED)
 
 add_executable(${PROJECT_NAME}
         main.cu
-#        simpleCUFFT.cu
+        pyplot.cpp
+        pyplot.h
         )
 
 target_link_libraries(${PROJECT_NAME}
@@ -38,11 +40,12 @@ target_link_libraries(${PROJECT_NAME}
         ${CUDA_LIBRARIES}
         ${CUDA_CUFFT_LIBRARIES}
         ${CUDA_CUBLAS_LIBRARIES}
+        Python3::Python
         )
 
 include_directories(
         helpers
-#        ${CMAKE_SOURCE_DIR/helpers}
+        #        ${CMAKE_SOURCE_DIR/helpers}
         ${UHD_INCLUDE_DIRS}
         ${Boost_INCLUDE_DIRS}
         ${CUDA_INCLUDE_DIRS}
