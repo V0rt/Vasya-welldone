@@ -12,19 +12,19 @@ namespace plt = matplotlibcpp;
 class pyplot {
 
 public:
-    pyplot();
+    pyplot(string name = "");
 
     ~pyplot();
 
     void plot_vector(float *in, size_t length);
 
-    void plot_vector(vector<float> &in, size_t length = 0);
-
     void plot_vector(complex<float> *in, size_t length);
+
+    void plot_vector(vector<float> &in, size_t length = 0);
 
     void plot_vector(vector<complex<float>> &in, size_t length = 0);
 
-    void plot_matrix();
+    void plot_matrix(float *in, size_t rows, size_t columns);
 
     void vector_animate();
 
@@ -32,9 +32,18 @@ public:
 
     void start_animate();
 
+    void plot_dots(vector<complex<float>> in);
+
+    void plot_dots(vector<float> x, vector<float> y);
+
+    void show() { plt::show(); }
+
+    void pause(float sec) { plt::pause(sec); }
+
 private:
     float d_pause = 0.1;
-    string name;
+    string name = "";
+    long ax;
 };
 
 

@@ -29,18 +29,18 @@ find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
 add_executable(${PROJECT_NAME}
         main.cu
-        pyplot.cpp
-        pyplot.h
+#        pyplot.cpp
+#        pyplot.h
         )
 
 target_link_libraries(${PROJECT_NAME}
+        Python3::Python
         ${UHD_LIBRARIES}
         ${Boost_SYSTEM_LIBRARY}
         ${Boost_THREAD_LIBRARY}
         ${CUDA_LIBRARIES}
         ${CUDA_CUFFT_LIBRARIES}
         ${CUDA_CUBLAS_LIBRARIES}
-        Python3::Python
         )
 
 include_directories(

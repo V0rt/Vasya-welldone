@@ -1,4 +1,4 @@
-#include "pyplot.h"
+#include "matplotlibcpp.h"
 #include "functors.h"
 #include <thrust/iterator/transform_iterator.h>
 #include <thrust/iterator/counting_iterator.h>
@@ -7,7 +7,10 @@
 #include <thrust/functional.h>
 #include <stdio.h>
 #include <iostream>
-#include "matplotlibcpp.h"
+
+
+using namespace std;
+namespace plt = matplotlibcpp;
 
 struct complex_sinusoid {
     double freq; // frequency
@@ -30,8 +33,37 @@ struct complex_multiply {
     }
 };
 
+void plot(vector<complex<float>> const &ref) {
+    vector<float> i(ref.size());
+    vector<float> r(ref.size());
+    for (int ii = 0; ii < ref.size(); ++ii) {
+        cf a = ref[ii];
+        i[ii] = a.imag();
+        r[ii] = a.real();
+    }
+    plt::plot(i);
+    plt::plot(r);
+    plt::pause(0.01);
+//    plt::show();
+};
+
+void plot(vcf const &ref) {
+    vector<complex<float>> h_v(ref.size());
+    tr::copy(ref.begin(), ref.end(), h_v.begin());
+    plot(h_v);
+}
+
 int main() {
-//    auto source = make_shared<File_source>("/mnt/raid/REC/900/TBS-880-940_25msps_gain_08_step_5e6.cf32");
+    vector<float> a(1000);
+
+//    std::generate(std::execution::par_unseq, inputData.begin(), inputData.end(), []()-> Complex {
+//        thread_local std::default_random_engine generator; // thread_local so we don't have to do any locking
+//        thread_local std::normal_distribution<double> distribution(0.0, 0.5); // mean = 0.0, stddev = 0.5
+//        return Complex(distribution(generator), distribution(generator));
+//    });
+
+
+    //    auto source = make_shared<File_source>("/mnt/raid/REC/900/TBS-880-940_25msps_gain_08_step_5e6.cf32");
     std::cout << "alive" << std::endl;
     std::chrono::time_point<std::chrono::steady_clock> start, end;
     double tx_freq = 10e9;
@@ -76,6 +108,9 @@ int main() {
 
     // принятый блок
     vcf packet(lfm_iter, lfm_iter + ROW);
+
+
+
     // принятый блок перемноженный на расстройки
     vcf packet_sinus(ROW * Nr, cf(0));
 
@@ -93,7 +128,11 @@ int main() {
 
         // перемножаем с расстройками
         for (int r = 0; r < Nr; r++) {
-            thrust::transform(packet.begin(), packet.end(), sinusoid_iters[r], packet_sinus.begin() + ROW * r, complex_multiply());
+            thrust::transform(packet.begin(),
+                              packet.end(),
+                              sinusoid_iters[r],
+                              packet_sinus.begin() + ROW * r,
+                              complex_multiply());
         }
 
         // суммируем в каждой расстройке
@@ -107,7 +146,7 @@ int main() {
                               tr::plus<cf>());
             }
         }
-
+        plot(acc);
         /// сворачиваем с оригиналом
         // сначала в conv кладем спектр от просуммированного сигнала
         for (int r = 0; r < Nr; ++r) {
